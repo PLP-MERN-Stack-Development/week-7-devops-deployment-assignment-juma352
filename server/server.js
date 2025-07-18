@@ -22,8 +22,22 @@ const limiter = rateLimit({
 app.use("/api", limiter);
 
 // CORS configuration
+const allowedOrigins = [
+  process.env.CLIENT_URL || "http://localhost:3000",
+  "https://week-7-devops-deployment-assignment-omega.vercel.app"
+];
+
 const corsOptions = {
-  origin: process.env.CLIENT_URL || "http://localhost:3000",
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200
 };
